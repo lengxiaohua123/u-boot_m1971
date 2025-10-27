@@ -43,8 +43,17 @@
 	chassis-type = "handset";
 
 	aliases {
+		bluetooth0 = &bluetooth;
 		serial0 = &uart2;
+		hsuart0 = &uart13;
 		wifi0 = &wifi;
+	};
+
+	battery: battery {
+		compatible = "simple-battery";
+		charge-full-design-microamp-hours = <4000000>;
+		voltage-min-design-microvolt = <3400000>;
+		voltage-max-design-microvolt = <4400000>;
 	};
 
 	chosen {
@@ -513,6 +522,13 @@
 	status = "okay";
 };
 
+&ipa {
+	status = "okay";
+	qcom,gsi-loader = "self";
+	memory-region = <&ipa_fw_mem>;
+	firmware-name = "qcom/sm8150/xiaomi/raphael/ipa_fws.mbn";
+};
+
 &mdss_dsi0 {
 	vdda-supply = <&vdda_mipi_dsi0_1p2>;
 
@@ -563,6 +579,19 @@
 	};
 };
 
+&pm8150_rtc {
+       nvmem-cells = <&rtc_offset>;
+       nvmem-cell-names = "offset";
+       status = "okay";
+};
+
+&pm8150_sdam_2 {
+       status = "okay";
+       rtc_offset: rtc-offset@bc {
+               reg = <0xbc 0x4>;
+       };
+};
+
 &pm8150b_typec {
 	vdd-vbus-supply = <&pm8150b_vbus>;
 	vdd-pdphy-supply = <&vdda_usb_hs_3p1>;
@@ -591,6 +620,18 @@
 			};
 		};
 	};
+};
+
+&pm8150b_fg {
+	status = "okay";
+	monitored-battery = <&battery>;
+	power-supplies = <&pm8150b_charger>;
+	//power-supplies = <&ln8000_charger>;
+};
+
+&pm8150b_charger {
+	status = "okay";
+	monitored-battery = <&battery>;
 };
 
 &pm8150b_vbus {
@@ -893,16 +934,57 @@
 		power-source = <1>;
 	};
 
-	panel_te_pin: panel-te-state {
-		pins = "gpio8";
-		function = "mdp_vsync";
-		drive-strength = <2>;
-		bias-pull-down;
-	};
+        panel_te_pin: panel-te-state {
+                pins = "gpio8";
+                function = "mdp_vsync";
+                drive-strength = <2>;
+                bias-pull-down;
+        };
+
+    /* QUP UART pins */
+    qup_uart13_sleep: qup-uart13-sleep {
+        pinmux {
+            pins = "gpio43", "gpio44", "gpio45", "gpio46";
+            function = "gpio";
+        };
+        pinconf-cts {
+            pins = "gpio43";
+            bias-pull-down;
+        };
+        pinconf-rts {
+            pins = "gpio44";
+            bias-pull-down;
+        };
+        pinconf-tx {
+            pins = "gpio45";
+            bias-pull-up;
+        };
+        pinconf-rx {
+            pins = "gpio46";
+            bias-pull-up;
+        };
+    };
 };
 
 &uart2 {
 	status = "okay";
+};
+
+&uart13 {
+	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-1 = <&qup_uart13_sleep>;
+
+	bluetooth: bluetooth {
+		compatible = "qcom,wcn3998-bt";
+		vddio-supply = <&vreg_l7a_1p8>;
+		vddxo-supply = <&vreg_l7a_1p8>;
+		vddrf-supply = <&vreg_l2c_1p3>;
+		vddch0-supply = <&vreg_l11c_3p3>;
+		max-speed = <3200000>;
+		firmware-name = "crnv21.bin", "crbtfw21.tlv";
+	};
 };
 
 &ufs_mem_hc {
