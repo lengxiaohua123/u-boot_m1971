@@ -906,31 +906,6 @@
 		drive-strength = <2>;
 		bias-pull-down;
 	};
-
-	/* Touch panel pins */
-	tp_active: tp-active-state {
-		pins = "gpio122", "gpio54";
-		function = "gpio";
-		drive-strength = <16>;
-		bias-pull-up;
-	};
-
-	tp_int_suspend: tp-int-suspend-state {
-		pins = "gpio122";
-		function = "gpio";
-		drive-strength = <16>;
-		slew-rate = <0>;
-		bias-pull-up;
-		input-enable;
-	};
-
-	tp_reset_suspend: tp-reset-suspend-state {
-		pins = "gpio54";
-		function = "gpio";
-		drive-strength = <16>;
-		slew-rate = <1>;
-		bias-disable;
-	};
 };
 
 &uart2 {
@@ -970,6 +945,8 @@
 	/* Remove USB3 phy */
 	phys = <&usb_1_hsphy>;
 	phy-names = "usb2-phy";
+
+	usb-role-switch;
 };
 
 &usb_1_dwc3_hs {
