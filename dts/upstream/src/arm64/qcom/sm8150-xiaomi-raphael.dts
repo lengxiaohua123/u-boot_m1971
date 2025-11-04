@@ -43,8 +43,18 @@
 	chassis-type = "handset";
 
 	aliases {
+        bluetooth0 = &bluetooth;
 		serial0 = &uart2;
+        hsuart0 = &uart13;
 		wifi0 = &wifi;
+	};
+
+
+	battery: battery {
+		compatible = "simple-battery";
+		charge-full-design-microamp-hours = <4000000>;
+		voltage-min-design-microvolt = <3400000>;
+		voltage-max-design-microvolt = <4400000>;
 	};
 
 	chosen {
@@ -53,6 +63,7 @@
 		ranges;
 
 		stdout-path = "serial0:115200n8";
+        bootargs = "earlycon console=ttyMSM0,115200";
 
 		framebuffer: framebuffer@9c000000 {
 			compatible = "simple-framebuffer";
@@ -199,6 +210,28 @@
 		regulator-boot-on;
 		vin-supply = <&vph_pwr>;
 	};
+
+	vreg_tp_3p3: regulator-tp-3p3 {
+		compatible = "regulator-fixed";
+		regulator-name = "vreg_tp_3p3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&tlmm 98 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+		startup-delay-us = <5000>;
+	};
+
+	vreg_tp_1p8: regulator-tp-1p8 {
+		compatible = "regulator-fixed";
+		regulator-name = "vreg_tp_1p8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		gpio = <&tlmm 100 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+		startup-delay-us = <5000>;
+	};
 };
 
 &apps_rsc {
@@ -301,11 +334,6 @@
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1800000>;
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
-		};
-
-		vreg_l8a_0p75: ldo8 {
-			regulator-min-microvolt = <752000>;
-			regulator-max-microvolt = <816000>;
 		};
 
 		vddpx_10:
@@ -510,7 +538,28 @@
 };
 
 &i2c19 {
-	/* goodix,gt9886 @5d  */
+	clock-frequency = <100000>;
+
+	status = "okay";
+
+	goodix@5d {
+		compatible = "goodix,gt9886";
+		reg = <0x5d>;
+		avdd-supply = <&vreg_tp_3p3>;
+		vddio-supply = <&vreg_tp_1p8>;
+		interrupts-extended = <&tlmm 122 IRQ_TYPE_LEVEL_LOW>;
+		reset-gpios = <&tlmm 54 GPIO_ACTIVE_LOW>;
+		touchscreen-size-x = <1080>;
+		touchscreen-size-y = <2340>;
+	};
+};
+
+&ipa {
+	qcom,gsi-loader = "self";
+	memory-region = <&ipa_fw_mem>;
+	firmware-name = "qcom/sm8150/xiaomi/raphael/ipa_fws.mbn";
+
+	status = "okay";
 };
 
 &mdss {
@@ -567,6 +616,21 @@
 	};
 };
 
+&pm8150_rtc {
+       nvmem-cells = <&rtc_offset>;
+       nvmem-cell-names = "offset";
+
+       status = "okay";
+};
+
+&pm8150_sdam_2 {
+       status = "okay";
+
+       rtc_offset: rtc-offset@bc {
+               reg = <0xbc 0x4>;
+       };
+};
+
 &pm8150b_typec {
 	vdd-vbus-supply = <&pm8150b_vbus>;
 	vdd-pdphy-supply = <&vdda_usb_hs_3p1>;
@@ -595,6 +659,20 @@
 			};
 		};
 	};
+};
+
+&pm8150b_fg {
+	monitored-battery = <&battery>;
+	power-supplies = <&pm8150b_charger>;
+	//power-supplies = <&ln8000_charger>;
+
+	status = "okay";
+};
+
+&pm8150b_charger {
+	monitored-battery = <&battery>;
+
+	status = "okay";
 };
 
 &pm8150b_vbus {
@@ -903,11 +981,78 @@
 		drive-strength = <2>;
 		bias-pull-down;
 	};
+
+    /* QUP UART pins */
+    qup_uart13_sleep: qup-uart13-sleep {
+        pinmux {
+            pins = "gpio43", "gpio44", "gpio45", "gpio46";
+            function = "gpio";
+        };
+        pinconf-cts {
+            pins = "gpio43";
+            bias-pull-down;
+        };
+        pinconf-rts {
+            pins = "gpio44";
+            bias-pull-down;
+        };
+        pinconf-tx {
+            pins = "gpio45";
+            bias-pull-up;
+        };
+        pinconf-rx {
+            pins = "gpio46";
+            bias-pull-up;
+        };
+    };
+
+    /* Touch panel pins */
+    tp_active: tp_active {
+        pins = "gpio122", "gpio54";
+        function = "gpio";
+        drive-strength = <16>;
+        bias-pull-up;
+    };
+
+    tp_int_suspend: tp_int_suspend {
+        pins = "gpio122";
+        function = "gpio";
+        drive-strength = <16>;
+        input-enable;
+        slew-rate = <0>;
+        bias-pull-up;
+    };
+
+    tp_reset_suspend: tp_reset_suspend {
+        pins = "gpio54";
+        function = "gpio";
+        drive-strength = <16>;
+        slew-rate = <1>;
+        bias-disable;
+    };
 };
 
 &uart2 {
 	status = "okay";
 };
+
+&uart13 {
+	pinctrl-1 = <&qup_uart13_sleep>;
+	pinctrl-names = "default", "sleep";
+
+	status = "okay";
+
+	bluetooth: bluetooth {
+		compatible = "qcom,wcn3998-bt";
+		vddio-supply = <&vreg_l7a_1p8>;
+		vddxo-supply = <&vreg_l7a_1p8>;
+		vddrf-supply = <&vreg_l2c_1p3>;
+		vddch0-supply = <&vreg_l11c_3p3>;
+		max-speed = <3200000>;
+		firmware-name = "crnv21.bin", "crbtfw21.tlv";
+	};
+};
+
 
 &ufs_mem_hc {
 	reset-gpios = <&tlmm 175 GPIO_ACTIVE_LOW>;
@@ -942,8 +1087,6 @@
 	/* Remove USB3 phy */
 	phys = <&usb_1_hsphy>;
 	phy-names = "usb2-phy";
-
-	usb-role-switch;
 };
 
 &usb_1_dwc3_hs {
@@ -964,6 +1107,7 @@
 	vdd-1.3-rfa-supply = <&vdda_wcss_adcdac_1>;
 	vdd-3.3-ch0-supply = <&vreg_l11c_3p3>;
 	vdd-3.3-ch1-supply = <&vreg_l10c_3p3>;
+    qcom,calibration-variant = "xiaomi_raphael";
 
 	status = "okay";
 };
