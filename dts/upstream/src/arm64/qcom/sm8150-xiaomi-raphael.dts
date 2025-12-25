@@ -109,6 +109,50 @@
 		regulator-max-microvolt = <6000000>;
 	};
 
+	/*
+	 * Apparently RPMh does not provide support for PM8150 S4 because it
+	 * is always-on; model it as a fixed regulator.
+	 */
+	vreg_s4a_1p8: regulator-pm8150-s4 {
+		compatible = "regulator-fixed";
+		regulator-name = "vreg_s4a_1p8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+		regulator-boot-on;
+		vin-supply = <&vph_pwr>;
+	};
+
+	vph_pwr: regulator-vph-pwr {
+		compatible = "regulator-fixed";
+		regulator-name = "vph_pwr";
+		regulator-min-microvolt = <3700000>;
+		regulator-max-microvolt = <3700000>;
+ 	};
+
+	vreg_tp_3p3: regulator-tp-3p3 {
+		compatible = "regulator-fixed";
+		regulator-name = "vreg_tp_3p3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&tlmm 98 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+		startup-delay-us = <5000>;
+	};
+	
+	vreg_tp_1p8: regulator-tp-1p8 {
+		compatible = "regulator-fixed";
+		regulator-name = "vreg_tp_1p8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		gpio = <&tlmm 100 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-boot-on;
+		startup-delay-us = <5000>;
+	};
+
+
 	reserved-memory {
 		tz_mem: memory@86200000 {
 			reg = <0x0 0x86200000 0x0 0x5500000>;
@@ -186,49 +230,6 @@
 			qcom,vmid = <QCOM_SCM_VMID_MSS_MSA>;
 			no-map;
 		};
-	};
-
-	/*
-	 * Apparently RPMh does not provide support for PM8150 S4 because it
-	 * is always-on; model it as a fixed regulator.
-	 */
-	vreg_s4a_1p8: regulator-pm8150-s4 {
-		compatible = "regulator-fixed";
-		regulator-name = "vreg_s4a_1p8";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		regulator-always-on;
-		regulator-boot-on;
-		vin-supply = <&vph_pwr>;
-	};
-
-	vph_pwr: regulator-vph-pwr {
-		compatible = "regulator-fixed";
-		regulator-name = "vph_pwr";
-		regulator-min-microvolt = <3700000>;
-		regulator-max-microvolt = <3700000>;
- 	};
-
-	vreg_tp_3p3: regulator-tp-3p3 {
-		compatible = "regulator-fixed";
-		regulator-name = "vreg_tp_3p3";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&tlmm 98 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-boot-on;
-		startup-delay-us = <5000>;
-	};
-	
-	vreg_tp_1p8: regulator-tp-1p8 {
-		compatible = "regulator-fixed";
-		regulator-name = "vreg_tp_1p8";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		gpio = <&tlmm 100 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-boot-on;
-		startup-delay-us = <5000>;
 	};
 };
 
