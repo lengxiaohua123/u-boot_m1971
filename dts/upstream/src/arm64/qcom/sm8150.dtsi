@@ -2334,7 +2334,7 @@
 
 			status = "disabled";
 
-			zap-shader {
+			gpu_zap_shader: zap-shader {
 				memory-region = <&gpu_mem>;
 			};
 
@@ -4090,6 +4090,8 @@
 
 				phys = <&mdss_dsi0_phy>;
 
+				refgen-supply = <&refgen>;
+
 				status = "disabled";
 
 				#address-cells = <1>;
@@ -4183,6 +4185,8 @@
 				refgen-supply = <&refgen>;
 
 				phys = <&mdss_dsi1_phy>;
+
+				refgen-supply = <&refgen>;
 
 				status = "disabled";
 
