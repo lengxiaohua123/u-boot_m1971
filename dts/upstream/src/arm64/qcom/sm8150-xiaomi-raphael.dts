@@ -39,7 +39,7 @@
 	model = "Xiaomi Redmi K20 Pro";
 	compatible = "xiaomi,raphael", "qcom,sm8150";
 	qcom,msm-id = <QCOM_ID_SM8150 0x20000>; /* SM8150 v2 */
-	qcom,board-id = <0x28008 0>;
+	qcom,board-id = <0x08 0>;
 	chassis-type = "handset";
 
 	aliases {
@@ -48,7 +48,6 @@
         hsuart0 = &uart13;
 		wifi0 = &wifi;
 	};
-
 
 	battery: battery {
 		compatible = "simple-battery";
@@ -67,9 +66,9 @@
 
 		framebuffer: framebuffer@9c000000 {
 			compatible = "simple-framebuffer";
-			reg = <0 0x9c000000 0 (1080 * 2340 * 4)>;
+			reg = <0 0x9c000000 0 (1080 * 2232 * 4)>;
 			width = <1080>;
-			height = <2340>;
+			height = <2232>;
 			stride = <(1080 * 4)>;
 			format = "a8r8g8b8";
 			display = <&panel>;
@@ -77,11 +76,11 @@
 		};
 	};
 
-	disp_vci_vreg: disp-vci-vreg {
+	disp_vci_vreg: disp_vci_vreg {
 		compatible = "regulator-fixed";
 		regulator-name = "disp_vci_vreg";
-		regulator-boot-on;
 		enable-active-high;
+		regulator-boot-on;
 		gpio = <&tlmm 99 GPIO_ACTIVE_HIGH>;
 	};
 
@@ -101,53 +100,53 @@
 
 	reserved-memory {
 		tz_mem: memory@86200000 {
-			reg = <0x0 0x86200000 0x0 0x5500000>;
 			no-map;
+			reg = <0x0 0x86200000 0x0 0x5500000>;
 		};
 
 		adsp_mem: memory@8be00000 {
-			reg = <0x0 0x8be00000 0x0 0x2200000>;
 			no-map;
+			reg = <0x0 0x8be00000 0x0 0x2200000>;
 		};
 
 		mpss_mem: memory@8e000000 {
-			reg = <0x0 0x8e000000 0x0 0x9600000>;
 			no-map;
+			reg = <0x0 0x8e000000 0x0 0x9600000>;
 		};
 
 		venus_mem: memory@97600000 {
-			reg = <0x0 0x97600000 0x0 0x500000>;
 			no-map;
+			reg = <0x0 0x97600000 0x0 0x500000>;
 		};
 
 		slpi_mem: memory@97b00000 {
-			reg = <0x0 0x97b00000 0x0 0x1400000>;
 			no-map;
+			reg = <0x0 0x97b00000 0x0 0x1400000>;
 		};
 
 		ipa_fw_mem: memory@98f00000 {
-			reg = <0x0 0x98f00000 0x0 0x10000>;
 			no-map;
+			reg = <0x0 0x98f00000 0x0 0x10000>;
 		};
 
 		ipa_gsi_mem: memory@98f10000 {
-			reg = <0x0 0x98f10000 0x0 0x5000>;
 			no-map;
+			reg = <0x0 0x98f10000 0x0 0x5000>;
 		};
 
 		gpu_mem: memory@98f15000 {
-			reg = <0x0 0x98f15000 0x0 0x2000>;
 			no-map;
+			reg = <0x0 0x98f15000 0x0 0x2000>;
 		};
 
 		spss_mem: memory@99000000 {
-			reg = <0x0 0x99000000 0x0 0x100000>;
 			no-map;
+			reg = <0x0 0x99000000 0x0 0x100000>;
 		};
 
 		cdsp_mem: memory@99100000 {
-			reg = <0x0 0x99100000 0x0 0x1400000>;
 			no-map;
+			reg = <0x0 0x99100000 0x0 0x1400000>;
 		};
 
 		cont_splash_mem: memory@9c000000 {
@@ -164,24 +163,28 @@
 			compatible = "ramoops";
 			reg = <0x0 0xa1600000 0x0 0x800000>;
 			console-size = <0x400000>;
-			pmsg-size = <0x200000>;
 			ecc-size = <8>;
+			ftrace-size = <0>;
+			pmsg-size = <0x200000>;
+			record-size = <0>;
 			no-map;
 		};
 
 		rmtfs_mem: memory@fe101000 {
 			compatible = "qcom,rmtfs-mem";
 			reg = <0 0xfe101000 0 0x300000>;
-			qcom,client-id = <1>;
-			qcom,vmid = <QCOM_SCM_VMID_MSS_MSA>;
 			no-map;
+
+			qcom,client-id = <1>;
+			qcom,vmid = <15>;
 		};
 	};
 
 	gpio-keys {
 		compatible = "gpio-keys";
-		pinctrl-0 = <&vol_up_n>;
+
 		pinctrl-names = "default";
+		pinctrl-0 = <&vol_up_n>;
 
 		key-vol-up {
 			label = "Volume Up";
@@ -204,10 +207,13 @@
 	vreg_s4a_1p8: pm8150-s4 {
 		compatible = "regulator-fixed";
 		regulator-name = "vreg_s4a_1p8";
+
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
+
 		regulator-always-on;
 		regulator-boot-on;
+
 		vin-supply = <&vph_pwr>;
 	};
 
@@ -334,6 +340,14 @@
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1800000>;
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
+		};
+
+		/* PM8150 LDO8 (L8A) — supplies vreg_l8a_0p75
+		* Device spec: nominal 0.752 V, active min 0.752 V, active max 0.904 V, IRATED = 300 mA
+		*/
+		vreg_l8a_0p75: ldo8 {
+                        regulator-min-microvolt = <752000>;
+                        regulator-max-microvolt = <816000>;
 		};
 
 		vddpx_10:
@@ -520,11 +534,11 @@
 	};
 };
 
-&gmu {
+&gpi_dma2 {
 	status = "okay";
 };
 
-&gpi_dma2 {
+&gmu {
 	status = "okay";
 };
 
@@ -533,15 +547,13 @@
 
 	zap-shader {
 		memory-region = <&gpu_mem>;
-		firmware-name = "qcom/sm8150/Xiaomi/raphael/a640_zap.mbn";
+		firmware-name = "qcom/sm8150/xiaomi/raphael/a640_zap.mbn";
 	};
 };
 
-&i2c19 {
+&i2c17 {
 	clock-frequency = <100000>;
-
 	status = "okay";
-
 	goodix@5d {
 		compatible = "goodix,gt9886";
 		reg = <0x5d>;
@@ -550,43 +562,36 @@
 		interrupts-extended = <&tlmm 122 IRQ_TYPE_LEVEL_LOW>;
 		reset-gpios = <&tlmm 54 GPIO_ACTIVE_LOW>;
 		touchscreen-size-x = <1080>;
-		touchscreen-size-y = <2340>;
+		touchscreen-size-y = <2232>;
 	};
 };
 
 &ipa {
+	status = "okay";
 	qcom,gsi-loader = "self";
 	memory-region = <&ipa_fw_mem>;
 	firmware-name = "qcom/sm8150/xiaomi/raphael/ipa_fws.mbn";
-
-	status = "okay";
-};
-
-&mdss {
-	status = "okay";
 };
 
 &mdss_dsi0 {
 	vdda-supply = <&vdda_mipi_dsi0_1p2>;
-
 	status = "okay";
-
 	panel: panel@0 {
 		compatible = "samsung,ams639rq08";
 		reg = <0>;
+		status = "okay";
 
 		vddio-supply = <&vreg_l14a_1p8>;
 		vdd3p3-supply = <&disp_vci_vreg>;
+
 		vsn-supply = <&vreg_ibb>;
 		vsp-supply = <&vreg_lab>;
 
 		reset-gpios = <&tlmm 6 GPIO_ACTIVE_LOW>;
 
+		pinctrl-names = "default", "sleep";
 		pinctrl-0 = <&panel_reset_active &panel_te_pin>;
 		pinctrl-1 = <&panel_reset_suspend &panel_te_pin>; 
-		pinctrl-names = "default", "sleep";
-
-		status = "okay";
 
 		port {
 			panel_in: endpoint {
@@ -602,8 +607,11 @@
 };
 
 &mdss_dsi0_phy {
+	status = "okay";
 	vdds-supply = <&vreg_l5a_0p875>;
+};
 
+&mdss {
 	status = "okay";
 };
 
@@ -619,13 +627,11 @@
 &pm8150_rtc {
        nvmem-cells = <&rtc_offset>;
        nvmem-cell-names = "offset";
-
        status = "okay";
 };
 
 &pm8150_sdam_2 {
        status = "okay";
-
        rtc_offset: rtc-offset@bc {
                reg = <0xbc 0x4>;
        };
@@ -634,11 +640,11 @@
 &pm8150b_typec {
 	vdd-vbus-supply = <&pm8150b_vbus>;
 	vdd-pdphy-supply = <&vdda_usb_hs_3p1>;
-
 	status = "okay";
 
 	connector {
 		compatible = "usb-c-connector";
+
 		power-role = "source";
 		data-role = "dual";
 		self-powered;
@@ -652,7 +658,6 @@
 
 			port@0 {
 				reg = <0>;
-
 				pm8150b_hs_in: endpoint {
 					remote-endpoint = <&usb_1_dwc3_hs>;
 				};
@@ -662,29 +667,25 @@
 };
 
 &pm8150b_fg {
+	status = "okay";
 	monitored-battery = <&battery>;
 	power-supplies = <&pm8150b_charger>;
 	//power-supplies = <&ln8000_charger>;
-
-	status = "okay";
 };
 
 &pm8150b_charger {
-	monitored-battery = <&battery>;
-
 	status = "okay";
+	monitored-battery = <&battery>;
 };
 
 &pm8150b_vbus {
 	regulator-min-microamp = <500000>;
 	regulator-max-microamp = <3000000>;
-
 	status = "okay";
 };
 
 &pm8150l_flash {
 	status = "okay";
-
 	led-1 {
 		function = LED_FUNCTION_FLASH;
 		color = <LED_COLOR_ID_WHITE>;
@@ -708,6 +709,13 @@
 	status = "okay";
 
 	led@1 {
+		status = "disabled";
+		reg = <1>;
+		color = <LED_COLOR_ID_WHITE>;
+		function = LED_FUNCTION_STATUS;
+	};
+
+	led@2 {
 		reg = <2>;
 		color = <LED_COLOR_ID_RED>;
 		function = LED_FUNCTION_STATUS;
@@ -715,7 +723,7 @@
 		label = "popup-camera-left";
 	};
 
-	led@2 {
+	led@3 {
 		reg = <3>;
 		color = <LED_COLOR_ID_RED>;
 		function = LED_FUNCTION_STATUS;
@@ -725,9 +733,9 @@
 };
 
 &pm8150l_wled {
-	qcom,num-strings = <3>;
 	qcom,cabc;
 	qcom,cabc-sel = <1>;
+	qcom,num-strings = <3>;
 };
 
 &pon {
@@ -740,9 +748,9 @@
 };
 
 &pon_resin {
-	linux,code = <KEY_VOLUMEDOWN>;
-
 	status = "okay";
+
+	linux,code = <KEY_VOLUMEDOWN>;
 };
 
 &qupv3_id_1 {
@@ -754,27 +762,23 @@
 };
 
 &remoteproc_adsp {
-	firmware-name = "qcom/sm8150/Xiaomi/raphael/adsp.mbn";
-
 	status = "okay";
+	firmware-name = "qcom/sm8150/xiaomi/raphael/adsp.mbn";
 };
 
 &remoteproc_cdsp {
-	firmware-name = "qcom/sm8150/Xiaomi/raphael/cdsp.mbn";
-
 	status = "okay";
+	firmware-name = "qcom/sm8150/xiaomi/raphael/cdsp.mbn";
 };
 
 &remoteproc_mpss {
-	firmware-name = "qcom/sm8150/Xiaomi/raphael/modem.mbn";
-
 	status = "okay";
+	firmware-name = "qcom/sm8150/xiaomi/raphael/modem.mbn";
 };
 
 &remoteproc_slpi {
-	firmware-name = "qcom/sm8150/Xiaomi/raphael/slpi.mbn";
-
 	status = "disabled";
+	firmware-name = "qcom/sm8150/xiaomi/raphael/slpi.mbn";
 };
 
 &tlmm {
@@ -962,8 +966,9 @@
 	panel_reset_active: panel-reset-active-state {
 		pins = "gpio6";
 		function = "gpio";
-		drive-strength = <8>;
+		drive-strength = <2>;
 		bias-disable;
+		output-low;
 		power-source = <1>;
 	};
 
@@ -1029,6 +1034,7 @@
         drive-strength = <16>;
         slew-rate = <1>;
         bias-disable;
+        output-high;
     };
 };
 
@@ -1037,10 +1043,10 @@
 };
 
 &uart13 {
-	pinctrl-1 = <&qup_uart13_sleep>;
-	pinctrl-names = "default", "sleep";
-
 	status = "okay";
+
+	pinctrl-names = "default", "sleep";
+	pinctrl-1 = <&qup_uart13_sleep>;
 
 	bluetooth: bluetooth {
 		compatible = "qcom,wcn3998-bt";
@@ -1053,8 +1059,9 @@
 	};
 };
 
-
 &ufs_mem_hc {
+	status = "okay";
+
 	reset-gpios = <&tlmm 175 GPIO_ACTIVE_LOW>;
 
 	vcc-supply = <&vreg_l10a_2p95>;
@@ -1063,27 +1070,24 @@
 	vccq-max-microamp = <700000>;
 	vccq2-supply = <&vreg_s4a_1p8>;
 	vccq2-max-microamp = <750000>;
-
-	status = "okay";
 };
 
 &ufs_mem_phy {
+	status = "okay";
+
 	vdda-phy-supply = <&vdda_ufs_2ln_core_1>;
 	vdda-pll-supply = <&vreg_l3c_1p2>;
-
-	status = "okay";
 };
 
 &usb_1 {
 	qcom,select-utmi-as-pipe-clk;
-
 	status = "okay";
 };
 
 &usb_1_dwc3 {
 	dr_mode = "otg";
+	usb-role-switch;
 	maximum-speed = "high-speed";
-
 	/* Remove USB3 phy */
 	phys = <&usb_1_hsphy>;
 	phy-names = "usb2-phy";
@@ -1097,17 +1101,16 @@
 	vdda-pll-supply = <&vdd_usb_hs_core>;
 	vdda33-supply = <&vdda_usb_hs_3p1>;
 	vdda18-supply = <&vdda_usb_hs_1p8>;
-
 	status = "okay";
 };
 
 &wifi {
+	status = "okay";
+
 	vdd-0.8-cx-mx-supply = <&vdda_wcss_pll>;
 	vdd-1.8-xo-supply = <&vreg_l7a_1p8>;
 	vdd-1.3-rfa-supply = <&vdda_wcss_adcdac_1>;
 	vdd-3.3-ch0-supply = <&vreg_l11c_3p3>;
 	vdd-3.3-ch1-supply = <&vreg_l10c_3p3>;
-    qcom,calibration-variant = "xiaomi_raphael";
-
-	status = "okay";
+	qcom,calibration-variant = "xiaomi_raphael";
 };
