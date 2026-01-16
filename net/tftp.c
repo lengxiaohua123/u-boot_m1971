@@ -714,10 +714,9 @@ static void tftp_timeout_handler(void)
 	}
 }
 
-static int tftp_init_load_addr(void)
+static void tftp_init_load_addr(void)
 {
 	tftp_load_addr = image_load_addr;
-	return 0;
 }
 
 static int saved_tftp_block_size_option;
@@ -901,13 +900,7 @@ void tftp_start(enum proto_t protocol)
 	} else
 #endif
 	{
-		if (tftp_init_load_addr()) {
-			eth_halt();
-			net_set_state(NETLOOP_FAIL);
-			puts("\nTFTP error: ");
-			puts("trying to overwrite reserved memory...\n");
-			return;
-		}
+		tftp_init_load_addr();
 		printf("Load address: 0x%lx\n", tftp_load_addr);
 		puts("Loading: *\b");
 		tftp_state = STATE_SEND_RRQ;
@@ -926,14 +919,13 @@ void tftp_start(enum proto_t protocol)
 	/* Use a pseudo-random port unless a specific port is set */
 	tftp_our_port = 1024 + (get_timer(0) % 3072);
 
-#ifdef CONFIG_TFTP_PORT
 	ep = env_get("tftpdstp");
 	if (ep != NULL)
 		tftp_remote_port = simple_strtol(ep, NULL, 10);
 	ep = env_get("tftpsrcp");
 	if (ep != NULL)
 		tftp_our_port = simple_strtol(ep, NULL, 10);
-#endif
+
 	tftp_cur_block = 0;
 	tftp_windowsize = 1;
 	tftp_last_nack = 0;
@@ -954,12 +946,7 @@ void tftp_start_server(void)
 {
 	tftp_filename[0] = 0;
 
-	if (tftp_init_load_addr()) {
-		eth_halt();
-		net_set_state(NETLOOP_FAIL);
-		puts("\nTFTP error: trying to overwrite reserved memory...\n");
-		return;
-	}
+	tftp_init_load_addr();
 	printf("Using %s device\n", eth_get_name());
 	printf("Listening for TFTP transfer on %pI4\n", &net_ip);
 	printf("Load address: 0x%lx\n", tftp_load_addr);

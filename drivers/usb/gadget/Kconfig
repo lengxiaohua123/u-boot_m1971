@@ -39,6 +39,7 @@ menuconfig USB_GADGET
 
 config SPL_USB_GADGET
 	bool "USB Gadget Support in SPL"
+	depends on SPL_FRAMEWORK
 	help
 	  Enable USB Gadget API which allows to enable USB device functions
 	  in SPL.
@@ -60,6 +61,7 @@ config USB_GADGET_VENDOR_NUM
 	default 0x0955 if ARCH_TEGRA
 	default 0x1f3a if ARCH_SUNXI
 	default 0x2207 if ARCH_ROCKCHIP
+	default 0x18d1 if ARCH_QCOM
 	default 0x0
 	help
 	  Vendor ID of the USB device emulated, reported to the host device.
@@ -87,6 +89,7 @@ config USB_GADGET_PRODUCT_NUM
 	default 0x350b if ROCKCHIP_RK3588
 	default 0x350c if ROCKCHIP_RK3528
 	default 0x350e if ROCKCHIP_RK3576
+	default 0x4ee0 if ARCH_QCOM
 	default 0x0
 	help
 	  Product ID of the USB device emulated, reported to the host device.
@@ -105,6 +108,7 @@ config USB_GADGET_AT91
 
 config USB_GADGET_DWC2_OTG
 	bool "DesignWare USB2.0 HS OTG controller (gadget mode)"
+	depends on ARM
 	select USB_GADGET_DUALSPEED
 	help
 	  The Designware USB2.0 high-speed gadget controller
@@ -147,6 +151,7 @@ config USB_GADGET_OS_DESCRIPTORS
 
 config CI_UDC
 	bool "ChipIdea device controller"
+	depends on !DM_USB_GADGET
 	select USB_GADGET_DUALSPEED
 	help
 	  Say Y here to enable device controller functionality of the

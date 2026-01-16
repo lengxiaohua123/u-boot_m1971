@@ -186,6 +186,7 @@ F:	drivers/video/meson/
 F:	drivers/watchdog/meson_gxbb_wdt.c
 F:	include/configs/meson64.h
 F:	include/configs/meson64_android.h
+F:	tools/amlimage*
 F:	doc/board/amlogic/
 N:	meson
 
@@ -317,8 +318,10 @@ F:	arch/arm/include/asm/mach-imx/
 F:	board/freescale/*mx*/
 F:	board/freescale/common/
 F:	common/spl/spl_imx_container.c
+F:	doc/board/nxp/
 F:	doc/imx/
 F:	drivers/mailbox/imx-mailbox.c
+F:	drivers/remoteproc/imx*
 F:	drivers/serial/serial_mxc.c
 F:	include/imx_container.h
 
@@ -410,6 +413,7 @@ ARM MEDIATEK
 M:	Ryder Lee <ryder.lee@mediatek.com>
 M:	Weijie Gao <weijie.gao@mediatek.com>
 M:	Chunfeng Yun <chunfeng.yun@mediatek.com>
+M:	Igor Belwon <igor.belwon@mentallysanemainliners.org>
 R:	GSS_MTK_Uboot_upstream <GSS_MTK_Uboot_upstream@mediatek.com>
 S:	Maintained
 F:	arch/arm/mach-mediatek/
@@ -435,6 +439,7 @@ F:	drivers/spi/mtk_snfi_spi.c
 F:	drivers/spi/mtk_spim.c
 F:	drivers/spi/mtk_snor.c
 F:	drivers/timer/mtk_timer.c
+F:	drivers/ufs/ufs-mediatek*
 F:	drivers/usb/host/xhci-mtk.c
 F:	drivers/usb/mtu3/
 F:	drivers/watchdog/mtk_wdt.c
@@ -575,6 +580,7 @@ F:	drivers/mmc/rockchip_dw_mmc.c
 F:	drivers/pinctrl/rockchip/
 F:	drivers/ram/rockchip/
 F:	drivers/sysreset/sysreset_rockchip.c
+F:	drivers/ufs/*rockchip*
 F:	drivers/video/rockchip/
 F:	tools/rkcommon.c
 F:	tools/rkcommon.h
@@ -729,6 +735,7 @@ F:	drivers/spi/stm32_ospi.c
 F:	drivers/spi/stm32_qspi.c
 F:	drivers/spi/stm32_spi.c
 F:	drivers/video/stm32/stm32_ltdc.c
+F:	drivers/video/stm32/stm32_lvds.c
 F:	drivers/watchdog/stm32mp_wdt.c
 F:	include/dt-bindings/clock/stm32fx-clock.h
 F:	include/dt-bindings/clock/stm32mp*
@@ -814,7 +821,7 @@ F:	include/linux/soc/ti/
 
 ARM U8500
 M:	Stephan Gerhold <stephan@gerhold.net>
-R:	Linus Walleij <linus.walleij@linaro.org>
+R:	Linus Walleij <linusw@kernel.org>
 S:	Maintained
 F:	arch/arm/dts/ste-*
 F:	arch/arm/mach-u8500/
@@ -1033,7 +1040,6 @@ F:	drivers/mtd/jedec_flash.c
 
 CLOCK
 M:	Lukasz Majewski <lukma@denx.de>
-M:	Sean Anderson <seanga2@gmail.com>
 S:	Maintained
 T:	git https://source.denx.de/u-boot/custodians/u-boot-clk.git
 F:	drivers/clk/
@@ -1182,6 +1188,15 @@ F:	scripts/event_dump.py
 F:	test/common/event.c
 F:	test/py/tests/test_event_dump.py
 
+EXTENSION
+M:	Kory Maincent <kory.maincent@bootlin.com>
+S:	Maintained
+F:	board/sunxi/chip.c
+F:	board/ti/common/cape_detect.c
+F:	boot/extension-uclass.c
+F:	cmd/extension_board.c
+F:	include/extension_board.h
+
 FASTBOOT
 M:	Mattijs Korpershoek <mkorpershoek@kernel.org>
 S:	Maintained
@@ -1245,6 +1260,17 @@ S:	Maintained
 F:	drivers/misc/gsc.c
 F:	include/gsc.h
 
+INTERCONNECT:
+M:	Neil Armstrong <neil.armstrong@linaro.org>
+S:	Maintained
+T:	git https://source.denx.de/u-boot/u-boot.git
+F:	arch/sandbox/include/asm/interconnect.h
+F:	doc/api/interconnect.rst
+F:	drivers/interconnect/
+F:	include/interconnect-uclass.h
+F:	include/interconnect.h
+F:	test/dm/interconnect.c
+
 I2C
 M:	Heiko Schocher <hs@nabladev.com>
 S:	Maintained
@@ -1294,7 +1320,7 @@ F:	drivers/video/mali_dp.c
 F:	drivers/i2c/i2c-versatile.c
 
 MBEDTLS
-M:	Raymond Mao <raymond.mao@linaro.org>
+M:	Raymond Mao <raymondmaoca@gmail.com>
 S:	Maintained
 F:	lib/mbedtls/
 
@@ -1591,7 +1617,7 @@ F:	drivers/pinctrl/pinctrl-k210.c
 F:	include/k210/
 
 RISC-V T-HEAD TH1520
-M:	Yao Zi <ziyao@disroot.org>
+M:	Yao Zi <me@ziyao.cc>
 S:	Maintained
 F:	arch/riscv/cpu/th1520/
 F:	drivers/clk/thead/clk-th1520-ap.c
@@ -1634,7 +1660,7 @@ F:	include/scmi*
 N:	scmi
 
 SEAMA
-M:	Linus Walleij <linus.walleij@linaro.org>
+M:	Linus Walleij <linusw@kernel.org>
 S:	Maintained
 F:	cmd/seama.c
 F:	doc/usage/cmd/seama.rst
@@ -1671,6 +1697,13 @@ S:	Maintained
 F:	include/slre.h
 F:	lib/slre.c
 F:	test/lib/slre.c
+
+SM3
+M:	Heiko Schocher <hs@nabladev.com>
+S:	Maintained
+F:	cmd/sm3sum.c
+F:	include/u-boot/sm3.h
+F:	lib/sm3.c
 
 SMCCC TRNG
 M:	Etienne Carriere <etienne.carriere@linaro.org>
